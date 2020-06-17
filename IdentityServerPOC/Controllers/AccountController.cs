@@ -40,8 +40,11 @@ namespace IdentityServerPOC.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(Models.LoginInputModel model,string button)
+        public async Task<IActionResult> Login(LoginInputModel model,string button)
         {
+            // check if we are in the context of an authorization request
+            var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
+
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByNameAsync(model.Username);
@@ -61,10 +64,15 @@ namespace IdentityServerPOC.Controllers
                         };
                     };
 
+                   
                     // issue authentication cookie with subject ID and username
                     await HttpContext.SignInAsync(user.Id, user.UserName, props);
 
-                    
+                    if (context != null)
+                    {
+                        // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
+                        return Redirect(model.ReturnUrl);
+                    }
                     // request for a local page
                     if (Url.IsLocalUrl(model.ReturnUrl))
                     {

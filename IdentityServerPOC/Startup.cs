@@ -1,4 +1,5 @@
 using System.Net;
+using IdentityServer4.Services;
 using IdentityServerPOC.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
@@ -44,6 +45,8 @@ namespace IdentityServerPOC
                .AddInMemoryApiResources(Config.GetApiResources())
                .AddInMemoryClients(Config.GetClients())
                .AddAspNetIdentity<AppUser>();
+
+            services.AddTransient<IProfileService, IdentityClaimsProfileService>();
 
             services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
               .AllowAnyMethod()

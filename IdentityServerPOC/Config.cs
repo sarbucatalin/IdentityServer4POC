@@ -22,7 +22,7 @@ namespace IdentityServerPOC
         {
             return new List<ApiResource>
             {
-                new ApiResource("resourceapi", "Resource API")
+                new ApiResource("digitalrecipiepoc", "Digital Recipie API")
                 {
                     Scopes = {new Scope("api.read")}
                 }
