@@ -25,9 +25,7 @@ namespace IdentityServerPOC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<ConnectionStrings>(Configuration.GetSection("ConnectionStrings"));
-
-            services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+           services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
             services.AddIdentity<AppUser, IdentityRole>()
               .AddEntityFrameworkStores<AppIdentityDbContext>()
@@ -81,18 +79,6 @@ namespace IdentityServerPOC
                 });
             });
 
-            //var serilog = new LoggerConfiguration()
-            //    .MinimumLevel.Verbose()
-            //    .Enrich.FromLogContext()
-            //    .WriteTo.File(@"authserver_log.txt");
-
-            //loggerFactory.WithFilter(new FilterLoggerSettings
-            //    {
-            //        { "IdentityServer4", LogLevel.Debug },
-            //        { "Microsoft", LogLevel.Warning },
-            //        { "System", LogLevel.Warning },
-            //    }).AddSerilog(serilog.CreateLogger());
-
             app.UseStaticFiles();
             app.UseCors("AllowAll");
             app.UseIdentityServer();
@@ -102,7 +88,7 @@ namespace IdentityServerPOC
             {
                 routes.MapRoute(
                     name: "default",
-                       template: "{controller=Account}/{action=Login}/{id?}");
+                       template: "{controller=Account}/{action=Login}");
             });
         }
     }

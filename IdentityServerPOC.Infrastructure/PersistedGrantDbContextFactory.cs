@@ -6,15 +6,14 @@ using System.Reflection;
 
 namespace IdentityServerPOC.Infrastructure
 {
-    public class PersistedGrantDbContextFactory :  IDesignTimeDbContextFactory<PersistedGrantDbContext>
+    public class PersistedGrantDbContextFactory : IDesignTimeDbContextFactory<PersistedGrantDbContext>
     {
         public PersistedGrantDbContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<PersistedGrantDbContext>();
-            optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=AuthServer;Trusted_Connection=True;MultipleActiveResultSets=true",
+            optionsBuilder.UseSqlServer(ConfigurationUtils.GetConnectionString("Default"),
                 sql => sql.MigrationsAssembly(typeof(PersistedGrantDbContextFactory).GetTypeInfo().Assembly.GetName().Name));
             return new PersistedGrantDbContext(optionsBuilder.Options, new OperationalStoreOptions());
         }
-
     }
 }

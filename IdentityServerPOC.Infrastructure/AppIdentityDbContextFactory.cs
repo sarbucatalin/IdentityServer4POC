@@ -1,13 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore.Design;
+using System.Reflection;
 
 namespace IdentityServerPOC.Infrastructure
 {
-    public class AppIdentityDbContextFactory : DesignTimeDbContextFactoryBase<AppIdentityDbContext>
+    public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<AppIdentityDbContext>
     {
-        protected override AppIdentityDbContext CreateNewInstance(DbContextOptions<AppIdentityDbContext> options)
+        AppIdentityDbContext IDesignTimeDbContextFactory<AppIdentityDbContext>.CreateDbContext(string[] args)
         {
-            return new AppIdentityDbContext(options);
+            var builder = new DbContextOptionsBuilder<AppIdentityDbContext>();
+            builder.UseSqlServer(ConfigurationUtils.GetConnectionString("Default"),
+                    sql => sql.MigrationsAssembly(typeof(ApplicationDbContextFactory).GetTypeInfo().Assembly.GetName().Name));
+            return new AppIdentityDbContext(builder.Options);
         }
     }
 }

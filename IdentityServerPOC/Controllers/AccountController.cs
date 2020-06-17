@@ -100,7 +100,6 @@ namespace IdentityServerPOC.Controllers
         [Route("api/[controller]")]
         public async Task<IActionResult> Register([FromBody] RegisterRequestViewModel model)
         {
-            //var aVal = 0; var blowUp = 1 / aVal;
 
             if (!ModelState.IsValid)
             {
