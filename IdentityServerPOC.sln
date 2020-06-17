@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServerPOC", "IdentityServerPOC\IdentityServerPOC.csproj", "{FAB50252-E24A-459C-8F59-4201101A5F17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServerPOC.Infrastructure", "IdentityServerPOC.Infrastructure\IdentityServerPOC.Infrastructure.csproj", "{55052008-2714-4ADC-9E81-2D69D5321D9A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FAB50252-E24A-459C-8F59-4201101A5F17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAB50252-E24A-459C-8F59-4201101A5F17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAB50252-E24A-459C-8F59-4201101A5F17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAB50252-E24A-459C-8F59-4201101A5F17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55052008-2714-4ADC-9E81-2D69D5321D9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55052008-2714-4ADC-9E81-2D69D5321D9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55052008-2714-4ADC-9E81-2D69D5321D9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55052008-2714-4ADC-9E81-2D69D5321D9A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C89BEAE0-0E38-4F81-B266-7474AC48EE46}
+	EndGlobalSection
+EndGlobal
