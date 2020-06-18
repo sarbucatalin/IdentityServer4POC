@@ -1,12 +1,8 @@
-using System.Net;
 using IdentityServer4.Services;
 using IdentityServerPOC.Infrastructure;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -33,7 +29,6 @@ namespace IdentityServerPOC
               .AddDefaultTokenProviders();
 
             services.AddIdentityServer().AddDeveloperSigningCredential()
-               // this adds the operational data from DB (codes, tokens, consents)
                .AddOperationalStore(options =>
                {
                    options.ConfigureDbContext = builder => builder.UseSqlServer(Configuration.GetConnectionString("Default"));
@@ -48,14 +43,7 @@ namespace IdentityServerPOC
 
             services.AddTransient<IProfileService, IdentityClaimsProfileService>();
 
-            services.AddCors(options => options.AddPolicy("AllowAll", p => p.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader()));
-
-            services.AddMvc(options =>
-            {
-                options.EnableEndpointRouting = false;
-            }).SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -66,32 +54,17 @@ namespace IdentityServerPOC
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseExceptionHandler(builder =>
-            {
-                builder.Run(async context =>
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                    context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
-
-                    var error = context.Features.Get<IExceptionHandlerFeature>();
-                    if (error != null)
-                    {
-                        context.Response.AddApplicationError(error.Error.Message);
-                        await context.Response.WriteAsync(error.Error.Message).ConfigureAwait(false);
-                    }
-                });
-            });
+            app.UseRouting();         
 
             app.UseStaticFiles();
-            app.UseCors("AllowAll");
+
+            app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
             app.UseIdentityServer();
 
-           
-            app.UseMvc(routes =>
+
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    name: "default",
-                       template: "{controller=Account}/{action=Login}");
+               endpoints.MapControllerRoute("default", "{controller=Account}/{action=Login}");
             });
         }
     }

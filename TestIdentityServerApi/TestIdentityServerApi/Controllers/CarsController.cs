@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DigitalRecipiePOC.Controllers
+namespace TestIdentityServerApi.Controllers
 {
     [Authorize(Policy = "ApiReader")]
     [Route("api/[controller]")]
@@ -13,7 +13,7 @@ namespace DigitalRecipiePOC.Controllers
         [HttpGet]
         public IActionResult GetCars()
         {
-            var cars = new List<string> { "Lamborgini", "Ferari", "Audi A4", "Passat CC" };
+            var cars = new List<string> { "Lamborgini", "Ferari", "Audi A4", "Passat CC", "Matiz" };
             return Ok(cars);
         }
     }

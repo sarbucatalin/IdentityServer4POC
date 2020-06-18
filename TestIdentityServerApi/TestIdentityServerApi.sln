@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalRecipiePOC", "DigitalRecipiePOC\DigitalRecipiePOC.csproj", "{C4022AD2-1DB8-493B-8A60-F96EBED3B40E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestIdentityServerApi", "TestIdentityServerApi\TestIdentityServerApi.csproj", "{DA8EDDDB-6DFC-4ECA-BED0-89C30054DC39}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C4022AD2-1DB8-493B-8A60-F96EBED3B40E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C4022AD2-1DB8-493B-8A60-F96EBED3B40E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C4022AD2-1DB8-493B-8A60-F96EBED3B40E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C4022AD2-1DB8-493B-8A60-F96EBED3B40E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA8EDDDB-6DFC-4ECA-BED0-89C30054DC39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA8EDDDB-6DFC-4ECA-BED0-89C30054DC39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA8EDDDB-6DFC-4ECA-BED0-89C30054DC39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA8EDDDB-6DFC-4ECA-BED0-89C30054DC39}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {A457D3AE-CBC1-4F26-BB88-8239F4D61576}
+		SolutionGuid = {18A95D32-F450-4A9F-9CB3-A5C107BE9F6B}
 	EndGlobalSection
 EndGlobal

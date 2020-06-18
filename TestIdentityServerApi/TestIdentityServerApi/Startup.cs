@@ -1,12 +1,12 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Security.Claims;
 
-namespace DigitalRecipiePOC
+namespace TestIdentityServerApi
 {
     public class Startup
     {
@@ -20,8 +20,6 @@ namespace DigitalRecipiePOC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           
-            services.AddControllers();
 
             services.AddAuthentication(options =>
             {
@@ -34,11 +32,15 @@ namespace DigitalRecipiePOC
                 o.RequireHttpsMetadata = false;
             });
 
+            services.AddControllers();
+
             services.AddAuthorization(options =>
             {
-                //options.AddPolicy("ApiReader", policy => policy.RequireClaim("scope", "api.read"));
-                //options.AddPolicy("SuperAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "superadmin"));
+                options.AddPolicy("ApiReader", policy => policy.RequireClaim("scope", "api.read"));
+                options.AddPolicy("SuperAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "superadmin"));
             });
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,20 +50,15 @@ namespace DigitalRecipiePOC
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            //app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseETagMiddleware();
-
-
-            app.UseEndpoints(endpoints =>
-            {
+            app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
             });
         }
