@@ -6,14 +6,14 @@ using System.Reflection;
 
 namespace IdentityServerPOC.Infrastructure
 {
-    public class PersistedGrantDbContextFactory : IDesignTimeDbContextFactory<PersistedGrantDbContext>
+    public class ConfigurationDbContextFactory : IDesignTimeDbContextFactory<ConfigurationDbContext>
     {
-        public PersistedGrantDbContext CreateDbContext(string[] args)
+        public ConfigurationDbContext CreateDbContext(string[] args)
         {
-            var optionsBuilder = new DbContextOptionsBuilder<PersistedGrantDbContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<ConfigurationDbContext>();
             optionsBuilder.UseSqlServer(ConfigurationUtils.GetConnectionString("Default"),
                 sql => sql.MigrationsAssembly(typeof(ConfigurationDbContextFactory).GetTypeInfo().Assembly.GetName().Name));
-            return new PersistedGrantDbContext(optionsBuilder.Options, new OperationalStoreOptions());
+            return new ConfigurationDbContext(optionsBuilder.Options,new ConfigurationStoreOptions());
         }
     }
 }

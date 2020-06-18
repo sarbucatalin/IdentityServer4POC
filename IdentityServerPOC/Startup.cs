@@ -1,3 +1,5 @@
+using IdentityServer4.EntityFramework.DbContexts;
+using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Services;
 using IdentityServerPOC.Infrastructure;
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Linq;
 
 namespace IdentityServerPOC
 {
@@ -29,6 +32,10 @@ namespace IdentityServerPOC
               .AddDefaultTokenProviders();
 
             services.AddIdentityServer().AddDeveloperSigningCredential()
+                .AddConfigurationStore(options =>
+                {
+                    options.ConfigureDbContext = builder => builder.UseSqlServer(Configuration.GetConnectionString("Default"));
+                })
                .AddOperationalStore(options =>
                {
                    options.ConfigureDbContext = builder => builder.UseSqlServer(Configuration.GetConnectionString("Default"));
@@ -36,9 +43,10 @@ namespace IdentityServerPOC
                    options.EnableTokenCleanup = true;
                    options.TokenCleanupInterval = 30; // interval in seconds
                })
-               .AddInMemoryIdentityResources(Config.GetIdentityResources())
-               .AddInMemoryApiResources(Config.GetApiResources())
-               .AddInMemoryClients(Config.GetClients())
+
+               //.AddInMemoryIdentityResources(Config.GetIdentityResources())
+               //.AddInMemoryApiResources(Config.GetApiResources())
+               //.AddInMemoryClients(Config.GetClients())
                .AddAspNetIdentity<AppUser>();
 
             services.AddTransient<IProfileService, IdentityClaimsProfileService>();
@@ -47,8 +55,11 @@ namespace IdentityServerPOC
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //InitializeDatabase(app);
+
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -66,6 +77,43 @@ namespace IdentityServerPOC
             {
                endpoints.MapControllerRoute("default", "{controller=Account}/{action=Login}");
             });
+        }
+
+        private void InitializeDatabase(IApplicationBuilder app)
+        {
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                serviceScope.ServiceProvider.GetRequiredService<PersistedGrantDbContext>().Database.Migrate();
+
+                var context = serviceScope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+                context.Database.Migrate();
+                if (!context.Clients.Any())
+                {
+                    foreach (var client in Config.GetClients())
+                    {
+                        context.Clients.Add(client.ToEntity());
+                    }
+                    context.SaveChanges();
+                }
+
+                if (!context.IdentityResources.Any())
+                {
+                    foreach (var resource in Config.GetIdentityResources())
+                    {
+                        context.IdentityResources.Add(resource.ToEntity());
+                    }
+                    context.SaveChanges();
+                }
+
+                if (!context.ApiResources.Any())
+                {
+                    foreach (var resource in Config.GetApiResources())
+                    {
+                        context.ApiResources.Add(resource.ToEntity());
+                    }
+                    context.SaveChanges();
+                }
+            }
         }
     }
 }
