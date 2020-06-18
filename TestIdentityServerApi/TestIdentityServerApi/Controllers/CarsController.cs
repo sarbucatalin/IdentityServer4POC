@@ -9,7 +9,7 @@ namespace TestIdentityServerApi.Controllers
     [ApiController]
     public class CarsController : ControllerBase
     {
-        [Authorize(Policy = "SuperAdmin")]
+        [Authorize]
         [HttpGet]
         public IActionResult GetCars()
         {

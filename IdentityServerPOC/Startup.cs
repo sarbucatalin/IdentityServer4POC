@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using System.Linq;
 
 namespace IdentityServerPOC
@@ -25,9 +26,14 @@ namespace IdentityServerPOC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-           services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+            services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
-            services.AddIdentity<AppUser, IdentityRole>()
+            services.AddIdentity<AppUser, IdentityRole>(options =>
+            {
+                options.Lockout.MaxFailedAccessAttempts = 3;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
+
+            })
               .AddEntityFrameworkStores<AppIdentityDbContext>()
               .AddDefaultTokenProviders();
 
@@ -43,11 +49,7 @@ namespace IdentityServerPOC
                    options.EnableTokenCleanup = true;
                    options.TokenCleanupInterval = 30; // interval in seconds
                })
-
-               //.AddInMemoryIdentityResources(Config.GetIdentityResources())
-               //.AddInMemoryApiResources(Config.GetApiResources())
-               //.AddInMemoryClients(Config.GetClients())
-               .AddAspNetIdentity<AppUser>();
+                .AddAspNetIdentity<AppUser>();
 
             services.AddTransient<IProfileService, IdentityClaimsProfileService>();
 
@@ -65,7 +67,7 @@ namespace IdentityServerPOC
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseRouting();         
+            app.UseRouting();
 
             app.UseStaticFiles();
 
@@ -75,7 +77,7 @@ namespace IdentityServerPOC
 
             app.UseEndpoints(endpoints =>
             {
-               endpoints.MapControllerRoute("default", "{controller=Account}/{action=Login}");
+                endpoints.MapControllerRoute("default", "{controller=Account}/{action=Login}");
             });
         }
 

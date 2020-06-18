@@ -37,7 +37,7 @@ namespace TestIdentityServerApi
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("ApiReader", policy => policy.RequireClaim("scope", "api.read"));
-                options.AddPolicy("SuperAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "superadmin"));
+                //options.AddPolicy("SuperAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "superadmin"));
             });
 
 

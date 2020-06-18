@@ -13,7 +13,8 @@ namespace IdentityServerPOC.Infrastructure
             var optionsBuilder = new DbContextOptionsBuilder<ConfigurationDbContext>();
             optionsBuilder.UseSqlServer(ConfigurationUtils.GetConnectionString("Default"),
                 sql => sql.MigrationsAssembly(typeof(ConfigurationDbContextFactory).GetTypeInfo().Assembly.GetName().Name));
-            return new ConfigurationDbContext(optionsBuilder.Options,new ConfigurationStoreOptions());
+           
+            return new ConfigurationDbContext(optionsBuilder.Options, new ConfigurationStoreOptions());
         }
     }
 }
