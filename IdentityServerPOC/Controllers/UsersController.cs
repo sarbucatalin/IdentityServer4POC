@@ -42,9 +42,10 @@ namespace IdentityServerPOC.Controllers
         public async Task<UserDto> GetUserByAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            var roles = await _userManager.GetRolesAsync(user);
+            var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+            var roleId = _roleManager.Roles.FirstOrDefault(ir => ir.Name == role)?.Id;
 
-            return new UserDto(user, roles.FirstOrDefault());
+            return new UserDto(user, roleId);
         }
 
         [HttpPost]
