@@ -60,10 +60,10 @@ namespace IdentityServerPOC.Controllers
                 return BadRequest(ModelState);
             }
 
-            if(!string.IsNullOrEmpty(model.Role) && !await _roleManager.RoleExistsAsync(model.Role))
-            {
-                return BadRequest();
-            }
+            //if(!string.IsNullOrEmpty(model.Role) && !await _roleManager.RoleExistsAsync(model.Role))
+            //{
+            //    return BadRequest();
+            //}
             
             var user = new AppUser { UserName = model.Email, Name = model.Name, Email = model.Email };
 
@@ -75,8 +75,8 @@ namespace IdentityServerPOC.Controllers
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("userName", user.UserName));
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("name", user.Name));
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("email", user.Email));
-            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", model.Role));
-            await _userManager.AddToRoleAsync(user, model.Role);
+            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", Roles.SuperAdmin));
+            await _userManager.AddToRoleAsync(user, Roles.SuperAdmin);
 
             return Ok(new RegisterResponseViewModel(user));
         }
