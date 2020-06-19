@@ -20,8 +20,7 @@ namespace IdentityServerPOC.Controllers
         public async Task<IActionResult> Create([FromBody] CreateRoleRequest request)
         {
             if (string.IsNullOrEmpty(request.Name) 
-                || (!string.IsNullOrEmpty(request.Name) 
-                    && await _roleManager.RoleExistsAsync(request.Name)))
+                && await _roleManager.RoleExistsAsync(request.Name))
             {
                 return BadRequest();
             }
