@@ -32,12 +32,13 @@ namespace IdentityServerPOC.Controllers
         public async Task<List<UserDto>> GetUsersAsync()
         {
             IEnumerable<AppUser> users = await _userManager.Users.ToListAsync();
-            var tmp = users.Select(user => new UserDto(user, null)).ToList();
+            var tmp = users.Select(user => new UserDto(user)).ToList();
             foreach(var x in tmp)
             {
                 var xx = await _userManager.FindByIdAsync(x.Id);
-                var role = await _userManager.GetRolesAsync(xx);
-                x.Role = role.FirstOrDefault();
+                var role = (await _userManager.GetRolesAsync(xx)).FirstOrDefault();
+                var roleId = _roleManager.Roles.FirstOrDefault(r => r.Name == role).Id;
+                x.RoleId = roleId;
             }
             return tmp;
         }

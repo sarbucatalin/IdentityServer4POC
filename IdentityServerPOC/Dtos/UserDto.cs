@@ -10,16 +10,19 @@ namespace IdentityServerPOC.Dtos
         public string Email { get; set; }
         public string Name { get; set; }
         public bool IsLocked { get; set; }
-        public string Role { get; set; }
+        public string RoleId { get; set; }
 
-        public UserDto(AppUser user,string role)
+        public UserDto(AppUser user, string roleId): this(user)
+        {
+            RoleId = roleId;
+        }
+        public UserDto(AppUser user)
         {
             Id = user.Id;
             UserName = user.UserName;
             Email = user.Email;
             Name = user.Name;
             IsLocked = user.LockoutEnabled;
-            Role = role;
         }
     }
 }
