@@ -17,7 +17,7 @@ namespace IdentityServerPOC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody]string name)
+        public async Task<IActionResult> Create([FromBody] string name)
         {
             if (string.IsNullOrEmpty(name) || (!string.IsNullOrEmpty(name) && await _roleManager.RoleExistsAsync(name)))
             {

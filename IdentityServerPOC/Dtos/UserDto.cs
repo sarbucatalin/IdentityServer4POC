@@ -1,5 +1,4 @@
 ﻿using IdentityServerPOC.Infrastructure;
-using System;
 
 namespace IdentityServerPOC.Dtos
 {
@@ -12,7 +11,7 @@ namespace IdentityServerPOC.Dtos
         public bool IsLocked { get; set; }
         public string Role { get; set; }
 
-        public UserDto(AppUser user,string role)
+        public UserDto(AppUser user, string role)
         {
             Id = user.Id;
             UserName = user.UserName;

@@ -1,8 +1,8 @@
 ﻿using IdentityServer4.Models;
 using System.Collections.Generic;
 using ApiResource = IdentityServer4.Models.ApiResource;
-using IdentityResource = IdentityServer4.Models.IdentityResource;
 using Client = IdentityServer4.Models.Client;
+using IdentityResource = IdentityServer4.Models.IdentityResource;
 
 namespace IdentityServerPOC
 {
