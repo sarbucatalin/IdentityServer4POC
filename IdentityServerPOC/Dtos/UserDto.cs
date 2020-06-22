@@ -11,6 +11,7 @@ namespace IdentityServerPOC.Dtos
         public bool IsLocked { get; set; }
         public string RoleId { get; set; }
 
+
         public UserDto(AppUser user, string roleId)
         {
             Id = user.Id;

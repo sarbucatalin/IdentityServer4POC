@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using IdentityServer4.Events;
+﻿using IdentityServer4.Events;
 using IdentityServer4.Services;
 using IdentityServerPOC.Infrastructure;
 using IdentityServerPOC.Models;
@@ -8,16 +6,18 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace IdentityServerPOC.Controllers
 {
-   
+
     public class AccountController : Controller
     {
         private readonly IIdentityServerInteractionService _interaction;
         private readonly UserManager<AppUser> _userManager;
         private readonly IEventService _events;
-        private TimeSpan _rememberMeLoginDuration =  TimeSpan.FromDays(30);
+        private TimeSpan _rememberMeLoginDuration = TimeSpan.FromDays(30);
         private const string _invalidCredentialsErrorMessage = "Invalid username or password";
         private readonly SignInManager<AppUser> _signInManager;
 
@@ -40,7 +40,7 @@ namespace IdentityServerPOC.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginInputModel model,string button)
+        public async Task<IActionResult> Login(LoginInputModel model, string button)
         {
             // check if we are in the context of an authorization request
             var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);
@@ -64,7 +64,7 @@ namespace IdentityServerPOC.Controllers
                         };
                     };
 
-                   
+
                     // issue authentication cookie with subject ID and username
                     await HttpContext.SignInAsync(user.Id, user.UserName, props);
 
@@ -92,7 +92,7 @@ namespace IdentityServerPOC.Controllers
                 await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials"));
                 ModelState.AddModelError(string.Empty, _invalidCredentialsErrorMessage);
             }
-            
+
             return View(model);
         }
 
@@ -103,6 +103,6 @@ namespace IdentityServerPOC.Controllers
             var context = await _interaction.GetLogoutContextAsync(logoutId);
             return Redirect(context.PostLogoutRedirectUri);
         }
- 
+
     }
 }
