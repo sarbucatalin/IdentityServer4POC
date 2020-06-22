@@ -32,6 +32,7 @@ namespace IdentityServerPOC
             {
                 options.Lockout.MaxFailedAccessAttempts = 3;
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
+                options.Lockout.AllowedForNewUsers = true;
 
             })
               .AddEntityFrameworkStores<AppIdentityDbContext>()
@@ -59,7 +60,7 @@ namespace IdentityServerPOC
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            //InitializeDatabase(app);
+            InitializeDatabase(app);
 
 
             if (env.IsDevelopment())

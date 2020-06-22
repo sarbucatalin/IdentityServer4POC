@@ -16,7 +16,7 @@ namespace IdentityServerPOC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
@@ -33,7 +33,7 @@ namespace IdentityServerPOC.Controllers
         {
             IEnumerable<AppUser> users = await _userManager.Users.ToListAsync();
             var tmp = users.Select(user => new UserDto(user, null)).ToList();
-            foreach(var x in tmp)
+            foreach (var x in tmp)
             {
                 var xx = await _userManager.FindByIdAsync(x.Id);
                 var role = await _userManager.GetRolesAsync(xx);
@@ -52,6 +52,7 @@ namespace IdentityServerPOC.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequestViewModel model)
         {
 
@@ -64,11 +65,11 @@ namespace IdentityServerPOC.Controllers
             //{
             //    return BadRequest();
             //}
-            
+
             var user = new AppUser { UserName = model.Email, Name = model.Name, Email = model.Email };
 
             var result = await _userManager.CreateAsync(user, model.Password);
-            
+
 
             if (!result.Succeeded) return BadRequest(result.Errors);
 
@@ -95,10 +96,45 @@ namespace IdentityServerPOC.Controllers
             if (existingRoles.Any())
                 await _userManager.RemoveFromRolesAsync(user, existingRoles);
 
-            var result =  await _userManager.AddToRoleAsync(user, updateUserRole.Role);
+            var result = await _userManager.AddToRoleAsync(user, updateUserRole.Role);
             if (result.Succeeded) return Ok();
             return BadRequest(result.Errors);
         }
 
-     }
+        [HttpPut]
+        [Route("{userId}/lock")]
+        public async Task<IActionResult> LockUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return BadRequest();
+
+            user.LockoutEnd = DateTime.MaxValue;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest(result.Errors);
+        }
+      
+        [HttpPut]
+        [Route("{userId}/Unlock")]
+        public async Task<IActionResult> Unlock(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return BadRequest();
+
+            user.LockoutEnd = DateTime.Now;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest(result.Errors);
+        }
+    }
 }
