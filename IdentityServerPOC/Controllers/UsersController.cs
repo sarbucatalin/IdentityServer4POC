@@ -1,10 +1,12 @@
 ﻿using IdentityServerPOC.Dtos;
 using IdentityServerPOC.Infrastructure;
 using IdentityServerPOC.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -13,7 +15,7 @@ namespace IdentityServerPOC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<AppUser> _userManager;
@@ -50,6 +52,7 @@ namespace IdentityServerPOC.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequestViewModel model)
         {
 
@@ -98,5 +101,40 @@ namespace IdentityServerPOC.Controllers
             return BadRequest(result.Errors);
         }
 
+        [HttpPut]
+        [Route("{userId}/lock")]
+        public async Task<IActionResult> LockUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return BadRequest();
+
+            user.LockoutEnd = DateTime.MaxValue;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest(result.Errors);
+        }
+      
+        [HttpPut]
+        [Route("{userId}/Unlock")]
+        public async Task<IActionResult> Unlock(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return BadRequest();
+
+            user.LockoutEnd = DateTime.Now;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest(result.Errors);
+        }
     }
 }

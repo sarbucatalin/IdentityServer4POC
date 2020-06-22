@@ -17,8 +17,8 @@ namespace IdentityServerPOC.Controllers
         private readonly IIdentityServerInteractionService _interaction;
         private readonly UserManager<AppUser> _userManager;
         private readonly IEventService _events;
-        private TimeSpan _rememberMeLoginDuration = TimeSpan.FromDays(30);
         private const string _invalidCredentialsErrorMessage = "Invalid username or password";
+        private const string _userLockedOutMessage = "user locked out";
         private readonly SignInManager<AppUser> _signInManager;
 
         public AccountController(IIdentityServerInteractionService interaction, UserManager<AppUser> userManager, IEventService events, SignInManager<AppUser> signInManager)
@@ -48,25 +48,11 @@ namespace IdentityServerPOC.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByNameAsync(model.Username);
-                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+                var signInResult = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberLogin, lockoutOnFailure: true);
+
+                if (user != null && signInResult.Succeeded)
                 {
                     await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.Name));
-
-                    // only set explicit expiration here if user chooses "remember me". 
-                    // otherwise we rely upon expiration configured in cookie middleware.
-                    AuthenticationProperties props = null;
-                    if (model.RememberLogin)
-                    {
-                        props = new AuthenticationProperties
-                        {
-                            IsPersistent = true,
-                            ExpiresUtc = DateTimeOffset.UtcNow.Add(_rememberMeLoginDuration)
-                        };
-                    };
-
-
-                    // issue authentication cookie with subject ID and username
-                    await HttpContext.SignInAsync(user.Id, user.UserName, props);
 
                     if (context != null)
                     {
@@ -89,8 +75,16 @@ namespace IdentityServerPOC.Controllers
                     }
                 }
 
-                await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials"));
-                ModelState.AddModelError(string.Empty, _invalidCredentialsErrorMessage);
+                if (signInResult.IsLockedOut)
+                {
+                    await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, _userLockedOutMessage));
+                    ModelState.AddModelError(string.Empty, _userLockedOutMessage);
+                }
+                else
+                {
+                    await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials"));
+                    ModelState.AddModelError(string.Empty, _invalidCredentialsErrorMessage);
+                }
             }
 
             return View(model);

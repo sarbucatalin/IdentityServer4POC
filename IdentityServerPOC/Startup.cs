@@ -37,6 +37,7 @@ namespace IdentityServerPOC
             {
                 options.Lockout.MaxFailedAccessAttempts = 3;
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
+                options.Lockout.AllowedForNewUsers = true;
 
             })
               .AddEntityFrameworkStores<AppIdentityDbContext>()
