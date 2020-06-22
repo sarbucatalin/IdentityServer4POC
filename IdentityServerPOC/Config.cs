@@ -1,8 +1,8 @@
 ﻿using IdentityServer4.Models;
 using System.Collections.Generic;
 using ApiResource = IdentityServer4.Models.ApiResource;
-using IdentityResource = IdentityServer4.Models.IdentityResource;
 using Client = IdentityServer4.Models.Client;
+using IdentityResource = IdentityServer4.Models.IdentityResource;
 
 namespace IdentityServerPOC
 {
@@ -15,6 +15,7 @@ namespace IdentityServerPOC
                 new IdentityResources.OpenId(),
                 new IdentityResources.Email(),
                 new IdentityResources.Profile(),
+
             };
         }
 
@@ -39,8 +40,8 @@ namespace IdentityServerPOC
                     ClientName = "Angular SPA",
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowedScopes = { "openid", "profile", "email", "api.read" },
-                    RedirectUris = {"http://localhost:4200/auth-callback"},
-                    PostLogoutRedirectUris = {"http://localhost:4200/"},
+                    RedirectUris = {"http://localhost:4200/auth-callback", "http://localhost:4200/signin-callback"},
+                    PostLogoutRedirectUris = {"http://localhost:4200/", "http://localhost:4200/signout-callback"},
                     AllowedCorsOrigins = {"http://localhost:4200"},
                     AllowAccessTokensViaBrowser = true,
                     AccessTokenLifetime = 3600

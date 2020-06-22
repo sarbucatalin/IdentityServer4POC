@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using IdentityServer4.Events;
+﻿using IdentityServer4.Events;
 using IdentityServer4.Services;
 using IdentityServerPOC.Infrastructure;
 using IdentityServerPOC.Models;
@@ -8,6 +6,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace IdentityServerPOC.Controllers
 {
