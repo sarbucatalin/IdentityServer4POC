@@ -48,37 +48,45 @@ namespace IdentityServerPOC.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByNameAsync(model.Username);
-                var signInResult = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberLogin, lockoutOnFailure: true);
-
-                if (user != null && signInResult.Succeeded)
+                if (user != null)
                 {
-                    await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.Name));
+                    var signInResult = await _signInManager.PasswordSignInAsync(user, model.Password, model.RememberLogin, lockoutOnFailure: true);
 
-                    if (context != null)
+                    if (signInResult.Succeeded)
                     {
-                        // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
-                        return Redirect(model.ReturnUrl);
+                        await _events.RaiseAsync(new UserLoginSuccessEvent(user.UserName, user.Id, user.Name));
+
+                        if (context != null)
+                        {
+                            // we can trust model.ReturnUrl since GetAuthorizationContextAsync returned non-null
+                            return Redirect(model.ReturnUrl);
+                        }
+                        // request for a local page
+                        if (Url.IsLocalUrl(model.ReturnUrl))
+                        {
+                            return Redirect(model.ReturnUrl);
+                        }
+                        else if (string.IsNullOrEmpty(model.ReturnUrl))
+                        {
+                            return Redirect("~/");
+                        }
+                        else
+                        {
+                            // user might have clicked on a malicious link - should be logged
+                            throw new Exception("invalid return URL");
+                        }
                     }
-                    // request for a local page
-                    if (Url.IsLocalUrl(model.ReturnUrl))
+
+                    if (signInResult.IsLockedOut)
                     {
-                        return Redirect(model.ReturnUrl);
-                    }
-                    else if (string.IsNullOrEmpty(model.ReturnUrl))
-                    {
-                        return Redirect("~/");
+                        await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, _userLockedOutMessage));
+                        ModelState.AddModelError(string.Empty, _userLockedOutMessage);
                     }
                     else
                     {
-                        // user might have clicked on a malicious link - should be logged
-                        throw new Exception("invalid return URL");
+                        await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, "invalid credentials"));
+                        ModelState.AddModelError(string.Empty, _invalidCredentialsErrorMessage);
                     }
-                }
-
-                if (signInResult.IsLockedOut)
-                {
-                    await _events.RaiseAsync(new UserLoginFailureEvent(model.Username, _userLockedOutMessage));
-                    ModelState.AddModelError(string.Empty, _userLockedOutMessage);
                 }
                 else
                 {

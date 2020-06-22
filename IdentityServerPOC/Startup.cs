@@ -1,3 +1,4 @@
+using IdentityServer4.Configuration;
 using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Services;
@@ -43,7 +44,15 @@ namespace IdentityServerPOC
               .AddEntityFrameworkStores<AppIdentityDbContext>()
               .AddDefaultTokenProviders();
 
-            services.AddIdentityServer().AddDeveloperSigningCredential()
+            services.AddIdentityServer(options =>
+            {
+                options.UserInteraction = new UserInteractionOptions()
+                {
+                    LogoutUrl = "/account/logout",
+                    LoginUrl = "/account/login",
+                    LoginReturnUrlParameter = "returnUrl",
+                };
+            }).AddDeveloperSigningCredential()
                 .AddConfigurationStore(options =>
                 {
                     options.ConfigureDbContext = builder => builder.UseSqlServer(Configuration.GetConnectionString("Default"));
@@ -58,8 +67,6 @@ namespace IdentityServerPOC
                 .AddAspNetIdentity<AppUser>();
 
             services.AddTransient<IProfileService, IdentityClaimsProfileService>();
-
-            services.AddControllersWithViews();
 
             services.AddSwaggerDocumentation();
 
