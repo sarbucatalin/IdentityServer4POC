@@ -28,24 +28,25 @@ namespace IdentityServerPOC.Controllers
         [HttpGet]
         public async Task<List<UserDto>> GetUsersAsync()
         {
-            IEnumerable<AppUser> users = await _userManager.Users.ToListAsync();
-            var tmp = users.Select(user => new UserDto(user, null)).ToList();
-            foreach (var x in tmp)
+            var returnUsers = new List<UserDto>();
+            IEnumerable<AppUser> appUsers = await _userManager.Users.ToListAsync();
+            foreach (var user in appUsers)
             {
-                var xx = await _userManager.FindByIdAsync(x.Id);
-                var role = await _userManager.GetRolesAsync(xx);
-                x.Role = role.FirstOrDefault();
+                var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                var roleId = _roleManager.Roles.FirstOrDefault(ir => ir.Name == role)?.Id;
+                returnUsers.Add(new UserDto(user, roleId));
             }
-            return tmp;
+            return returnUsers;
         }
 
         [HttpGet("{userId}")]
         public async Task<UserDto> GetUserByAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            var roles = await _userManager.GetRolesAsync(user);
+            var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+            var roleId = _roleManager.Roles.FirstOrDefault(ir => ir.Name == role)?.Id;
 
-            return new UserDto(user, roles.FirstOrDefault());
+            return new UserDto(user, roleId);
         }
 
         [HttpPost]
