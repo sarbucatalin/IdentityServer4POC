@@ -19,7 +19,7 @@ namespace IdentityServerPOC.Controllers
         private readonly IEventService _events;
         private const string _invalidCredentialsErrorMessage = "Invalid username or password";
         private const string _userLockedOutMessage = "user locked out";
-        private readonly SignInManager<AppUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public AccountController(IIdentityServerInteractionService interaction, UserManager<ApplicationUser> userManager, IEventService events, SignInManager<ApplicationUser> signInManager)
         {
