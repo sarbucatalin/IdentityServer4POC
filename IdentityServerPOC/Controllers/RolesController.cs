@@ -8,7 +8,7 @@ namespace IdentityServerPOC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-   
+    [Authorize]
     public class RolesController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -19,13 +19,14 @@ namespace IdentityServerPOC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody]string name)
+        public async Task<IActionResult> Create([FromBody] CreateRoleRequest request)
         {
-            if (string.IsNullOrEmpty(name) || (!string.IsNullOrEmpty(name) && await _roleManager.RoleExistsAsync(name)))
+            if (string.IsNullOrEmpty(request.Name) 
+                && await _roleManager.RoleExistsAsync(request.Name))
             {
                 return BadRequest();
             }
-            return Ok(await _roleManager.CreateAsync(new IdentityRole(name)));
+            return Ok(await _roleManager.CreateAsync(new IdentityRole(request.Name)));
         }
 
         [HttpGet]
@@ -39,5 +40,10 @@ namespace IdentityServerPOC.Controllers
         {
             return Ok(await _roleManager.FindByIdAsync(id));
         }
+    }
+
+    public class CreateRoleRequest
+    {
+        public string Name { get; set; }
     }
 }

@@ -2,6 +2,8 @@ using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Services;
 using IdentityServerPOC.Infrastructure;
+using IdentityServerPOC.Infrastructure.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Logging;
 using System;
 using System.Linq;
 
@@ -26,12 +29,15 @@ namespace IdentityServerPOC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            IdentityModelEventSource.ShowPII = true;
+
             services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
-            services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
-             {
-                 options.Lockout.MaxFailedAccessAttempts = 3;
-                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
+            services.AddIdentity<AppUser, IdentityRole>(options =>
+            {
+                options.Lockout.MaxFailedAccessAttempts = 3;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
+                options.Lockout.AllowedForNewUsers = true;
 
              })
               .AddEntityFrameworkStores<AppIdentityDbContext>()
@@ -54,6 +60,29 @@ namespace IdentityServerPOC
             services.AddTransient<IProfileService, IdentityClaimsProfileService>();
 
             services.AddControllersWithViews();
+
+            services.AddSwaggerDocumentation();
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.RequireAuthenticatedSignIn = false;
+            }).AddJwtBearer(o =>
+            {
+                o.Authority = "http://localhost:5000";
+                o.Audience = "digitalrecipiepoc";
+                o.RequireHttpsMetadata = false;
+             
+            });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ApiReader", policy => policy.RequireClaim("scope", "api.read"));
+                //options.AddPolicy("SuperAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "superadmin"));
+            });
+          
+            services.AddControllersWithViews().AddNewtonsoftJson();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -65,6 +94,7 @@ namespace IdentityServerPOC
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwaggerDocumentation();
             }
 
             app.UseRouting();
@@ -74,6 +104,8 @@ namespace IdentityServerPOC
             app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
             app.UseIdentityServer();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

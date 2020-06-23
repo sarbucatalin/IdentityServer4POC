@@ -17,7 +17,7 @@ namespace IdentityServerPOC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -30,24 +30,31 @@ namespace IdentityServerPOC.Controllers
         }
 
         [HttpGet]
-        public async Task<List<UserViewModel>> GetUsersAsync()
+        public async Task<List<UserDto>> GetUsersAsync()
         {
-            IEnumerable<ApplicationUser> users = await _userManager.Users.ToListAsync();
-
-                    
-            return users.Select(user => new UserViewModel(user)).ToList();
+            var returnUsers = new List<UserDto>();
+            IEnumerable<AppUser> appUsers = await _userManager.Users.ToListAsync();
+            foreach (var user in appUsers)
+            {
+                var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+                var roleId = _roleManager.Roles.FirstOrDefault(ir => ir.Name == role)?.Id;
+                returnUsers.Add(new UserDto(user, roleId));
+            }
+            return returnUsers;
         }
 
         [HttpGet("{userId}")]
         public async Task<UserViewModel> GetUserByAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-           
-            return new UserViewModel(user);
+            var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
+            var roleId = _roleManager.Roles.FirstOrDefault(ir => ir.Name == role)?.Id;
+
+            return new UserDto(user, roleId);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register(RegisterRequestViewModel model)
+        public async Task<IActionResult> Register([FromBody] RegisterRequestViewModel model)
         {
 
             if (!ModelState.IsValid)
@@ -63,7 +70,7 @@ namespace IdentityServerPOC.Controllers
             var user = new ApplicationUser { UserName = model.Email, Name = model.Name, Email = model.Email };
 
             var result = await _userManager.CreateAsync(user, model.Password);
-            
+
 
             if (!result.Succeeded) return BadRequest(result.Errors);
 
@@ -90,10 +97,45 @@ namespace IdentityServerPOC.Controllers
             if (existingRoles.Any())
                 await _userManager.RemoveFromRolesAsync(user, existingRoles);
 
-            var result =  await _userManager.AddToRoleAsync(user, updateUserRole.Role);
+            var result = await _userManager.AddToRoleAsync(user, updateUserRole.Role);
             if (result.Succeeded) return Ok();
             return BadRequest(result.Errors);
         }
 
-     }
+        [HttpPut]
+        [Route("{userId}/lock")]
+        public async Task<IActionResult> LockUser(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return BadRequest();
+
+            user.LockoutEnd = DateTime.MaxValue;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest(result.Errors);
+        }
+      
+        [HttpPut]
+        [Route("{userId}/Unlock")]
+        public async Task<IActionResult> Unlock(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return BadRequest();
+
+            user.LockoutEnd = DateTime.Now;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest(result.Errors);
+        }
+    }
 }

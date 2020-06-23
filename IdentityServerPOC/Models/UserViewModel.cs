@@ -1,5 +1,4 @@
 ﻿using IdentityServerPOC.Infrastructure;
-using System;
 using System.Linq;
 
 namespace IdentityServerPOC.Dtos
