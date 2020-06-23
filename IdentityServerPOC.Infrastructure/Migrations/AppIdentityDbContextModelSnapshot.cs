@@ -112,6 +112,15 @@ namespace IdentityServerPOC.Infrastructure.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "73f49c36-a9df-4c4f-8ee7-1c985aad5369",
+                            ConcurrencyStamp = "fcc5a00e-da1d-478e-bebe-ad9a21e7de62",
+                            Name = "superadmin",
+                            NormalizedName = "SUPERADMIN"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

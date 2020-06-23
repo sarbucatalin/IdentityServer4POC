@@ -1,6 +1,7 @@
 ﻿using IdentityServerPOC.Dtos;
 using IdentityServerPOC.Infrastructure;
 using IdentityServerPOC.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -17,7 +19,7 @@ namespace IdentityServerPOC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    //[Authorize]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -30,15 +32,15 @@ namespace IdentityServerPOC.Controllers
         }
 
         [HttpGet]
-        public async Task<List<UserDto>> GetUsersAsync()
+        public async Task<List<UserViewModel>> GetUsersAsync()
         {
-            var returnUsers = new List<UserDto>();
-            IEnumerable<AppUser> appUsers = await _userManager.Users.ToListAsync();
+            var returnUsers = new List<UserViewModel>();
+            IEnumerable<ApplicationUser> appUsers = await _userManager.Users.ToListAsync();
             foreach (var user in appUsers)
             {
                 var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
                 var roleId = _roleManager.Roles.FirstOrDefault(ir => ir.Name == role)?.Id;
-                returnUsers.Add(new UserDto(user, roleId));
+                returnUsers.Add(new UserViewModel(user));
             }
             return returnUsers;
         }
@@ -50,7 +52,7 @@ namespace IdentityServerPOC.Controllers
             var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
             var roleId = _roleManager.Roles.FirstOrDefault(ir => ir.Name == role)?.Id;
 
-            return new UserDto(user, roleId);
+            return new UserViewModel(user);
         }
 
         [HttpPost]
@@ -62,10 +64,10 @@ namespace IdentityServerPOC.Controllers
                 return BadRequest(ModelState);
             }
 
-            if (!string.IsNullOrEmpty(model.Role) && !await _roleManager.RoleExistsAsync(model.Role))
-            {
-                return BadRequest();
-            }
+            //if (!string.IsNullOrEmpty(model.Role) && !await _roleManager.RoleExistsAsync(model.Role))
+            //{
+            //    return BadRequest();
+            //}
 
             var user = new ApplicationUser { UserName = model.Email, Name = model.Name, Email = model.Email };
 
@@ -77,8 +79,8 @@ namespace IdentityServerPOC.Controllers
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("userName", user.UserName));
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("name", user.Name));
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("email", user.Email));
-            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", model.Role));
-            await _userManager.AddToRoleAsync(user, model.Role);
+            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", Roles.SuperAdmin));
+            await _userManager.AddToRoleAsync(user, Roles.SuperAdmin);
 
             return Ok(new RegisterResponseViewModel(user));
         }
