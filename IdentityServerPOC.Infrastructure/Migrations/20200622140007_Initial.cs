@@ -153,11 +153,6 @@ namespace IdentityServerPOC.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "67e495e4-31f0-45b7-a671-a4f3e56945c0", "4d661a99-718d-43c3-806e-27a5c9bf144a", "superadmin", "SUPERADMIN" });
-
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",

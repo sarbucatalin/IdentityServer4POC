@@ -33,13 +33,13 @@ namespace IdentityServerPOC
 
             services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
-            services.AddIdentity<AppUser, IdentityRole>(options =>
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
             {
                 options.Lockout.MaxFailedAccessAttempts = 3;
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
                 options.Lockout.AllowedForNewUsers = true;
 
-            })
+             })
               .AddEntityFrameworkStores<AppIdentityDbContext>()
               .AddDefaultTokenProviders();
 
@@ -55,7 +55,7 @@ namespace IdentityServerPOC
                    options.EnableTokenCleanup = true;
                    options.TokenCleanupInterval = 30; // interval in seconds
                })
-                .AddAspNetIdentity<AppUser>();
+                .AddAspNetIdentity<ApplicationUser>();
 
             services.AddTransient<IProfileService, IdentityClaimsProfileService>();
 
@@ -88,7 +88,7 @@ namespace IdentityServerPOC
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-          //  InitializeDatabase(app);
+            InitializeDatabase(app);
 
 
             if (env.IsDevelopment())

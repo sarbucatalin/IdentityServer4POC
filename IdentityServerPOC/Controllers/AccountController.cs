@@ -15,13 +15,13 @@ namespace IdentityServerPOC.Controllers
     public class AccountController : Controller
     {
         private readonly IIdentityServerInteractionService _interaction;
-        private readonly UserManager<AppUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEventService _events;
         private const string _invalidCredentialsErrorMessage = "Invalid username or password";
         private const string _userLockedOutMessage = "user locked out";
         private readonly SignInManager<AppUser> _signInManager;
 
-        public AccountController(IIdentityServerInteractionService interaction, UserManager<AppUser> userManager, IEventService events, SignInManager<AppUser> signInManager)
+        public AccountController(IIdentityServerInteractionService interaction, UserManager<ApplicationUser> userManager, IEventService events, SignInManager<ApplicationUser> signInManager)
         {
             _interaction = interaction;
             _userManager = userManager;
@@ -33,14 +33,14 @@ namespace IdentityServerPOC.Controllers
         public async Task<IActionResult> Login(string returnUrl)
         {
             var context = await _interaction.GetAuthorizationContextAsync(returnUrl);
-            var vm = new Models.LoginInputModel { ReturnUrl = returnUrl, Username = context?.LoginHint };
+            var vm = new Models.LoginViewModel { ReturnUrl = returnUrl, Username = context?.LoginHint };
 
             return View(vm);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginInputModel model, string button)
+        public async Task<IActionResult> Login(LoginViewModel model,string button)
         {
             // check if we are in the context of an authorization request
             var context = await _interaction.GetAuthorizationContextAsync(model.ReturnUrl);

@@ -13,10 +13,10 @@ namespace IdentityServerPOC.Infrastructure
 {
     public class IdentityClaimsProfileService : IProfileService
     {
-        private readonly IUserClaimsPrincipalFactory<AppUser> _claimsFactory;
-        private readonly UserManager<AppUser> _userManager;
+        private readonly IUserClaimsPrincipalFactory<ApplicationUser> _claimsFactory;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public IdentityClaimsProfileService(UserManager<AppUser> userManager, IUserClaimsPrincipalFactory<AppUser> claimsFactory)
+        public IdentityClaimsProfileService(UserManager<ApplicationUser> userManager, IUserClaimsPrincipalFactory<ApplicationUser> claimsFactory)
         {
             _userManager = userManager;
             _claimsFactory = claimsFactory;

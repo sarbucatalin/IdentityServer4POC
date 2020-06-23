@@ -3,7 +3,7 @@ using System;
 
 namespace IdentityServerPOC.Infrastructure.Migrations.ConfigurationDb
 {
-    public partial class InitialIdentityServerConfigurationDbMigration : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
