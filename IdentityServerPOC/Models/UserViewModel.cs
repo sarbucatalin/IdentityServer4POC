@@ -20,7 +20,7 @@ namespace IdentityServerPOC.Dtos
             Email = user.Email;
             Name = user.Name;
             IsLocked = user.LockoutEnabled;
-            Role = user.UserRoles != null ? user.UserRoles.FirstOrDefault().Role.Name : string.Empty;
+            //Role = user.Roles.Any() ? user.Roles.FirstOrDefault().ToString() : string.Empty;
         }
     }
 }

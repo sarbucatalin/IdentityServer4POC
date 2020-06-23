@@ -1,15 +1,16 @@
 ﻿using IdentityServerPOC.Dtos;
 using IdentityServerPOC.Infrastructure;
 using IdentityServerPOC.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Internal;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace IdentityServerPOC.Controllers
@@ -19,40 +20,34 @@ namespace IdentityServerPOC.Controllers
     //[Authorize]
     public class UsersController : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UsersController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+        public UsersController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
         }
 
         [HttpGet]
-        public async Task<List<UserDto>> GetUsersAsync()
+        public async Task<List<UserViewModel>> GetUsersAsync()
         {
-            IEnumerable<AppUser> users = await _userManager.Users.ToListAsync();
-            var tmp = users.Select(user => new UserDto(user, null)).ToList();
-            foreach(var x in tmp)
-            {
-                var xx = await _userManager.FindByIdAsync(x.Id);
-                var role = await _userManager.GetRolesAsync(xx);
-                x.Role = role.FirstOrDefault();
-            }
-            return tmp;
+            IEnumerable<ApplicationUser> users = await _userManager.Users.ToListAsync();
+
+                    
+            return users.Select(user => new UserViewModel(user)).ToList();
         }
 
         [HttpGet("{userId}")]
-        public async Task<UserDto> GetUserByAsync(string userId)
+        public async Task<UserViewModel> GetUserByAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            var roles = await _userManager.GetRolesAsync(user);
-
-            return new UserDto(user, roles.FirstOrDefault());
+           
+            return new UserViewModel(user);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Register([FromBody] RegisterRequestViewModel model)
+        public async Task<IActionResult> Register(RegisterRequestViewModel model)
         {
 
             if (!ModelState.IsValid)
@@ -60,12 +55,12 @@ namespace IdentityServerPOC.Controllers
                 return BadRequest(ModelState);
             }
 
-            //if(!string.IsNullOrEmpty(model.Role) && !await _roleManager.RoleExistsAsync(model.Role))
-            //{
-            //    return BadRequest();
-            //}
-            
-            var user = new AppUser { UserName = model.Email, Name = model.Name, Email = model.Email };
+            if (!string.IsNullOrEmpty(model.Role) && !await _roleManager.RoleExistsAsync(model.Role))
+            {
+                return BadRequest();
+            }
+
+            var user = new ApplicationUser { UserName = model.Email, Name = model.Name, Email = model.Email };
 
             var result = await _userManager.CreateAsync(user, model.Password);
             
@@ -75,14 +70,14 @@ namespace IdentityServerPOC.Controllers
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("userName", user.UserName));
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("name", user.Name));
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("email", user.Email));
-            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", Roles.SuperAdmin));
-            await _userManager.AddToRoleAsync(user, Roles.SuperAdmin);
+            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", model.Role));
+            await _userManager.AddToRoleAsync(user, model.Role);
 
             return Ok(new RegisterResponseViewModel(user));
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateRole(UpdateUserRoleDto updateUserRole)
+        public async Task<IActionResult> UpdateRole(UpdateUserRoleViewModel updateUserRole)
         {
             if (updateUserRole.Role.ToLower() == Roles.SuperAdmin)
                 return Forbid();
