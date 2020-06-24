@@ -1,25 +1,20 @@
-﻿using IdentityServerPOC.Dtos;
-using IdentityServerPOC.Infrastructure;
-using IdentityServerPOC.Models;
+﻿using IdentityServerPOC.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
+using UserManagement.Api.Models;
 
-namespace IdentityServerPOC.Controllers
+namespace UserManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize(Policy = "ApiReader")]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -56,6 +51,7 @@ namespace IdentityServerPOC.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequestViewModel model)
         {
 

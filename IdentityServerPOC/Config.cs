@@ -44,8 +44,8 @@ namespace IdentityServerPOC
                     ClientName = "Angular SPA",
                     AllowedGrantTypes = GrantTypes.Implicit,
                     AllowedScopes = { "openid", "profile", "email", "api.read" },
-                    RedirectUris = {"http://localhost:4200/auth-callback"},
-                    PostLogoutRedirectUris = {"http://localhost:4200/"},
+                    RedirectUris = {"http://localhost:4200/auth-callback","http://localhost:4200/signin-callback"},
+                    PostLogoutRedirectUris = {"http://localhost:4200/","http://localhost:4200/signout-callback"},
                     AllowedCorsOrigins = {"http://localhost:4200"},
                     AllowAccessTokensViaBrowser = true,
                     AccessTokenLifetime = 3600

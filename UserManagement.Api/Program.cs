@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace TestIdentityServerApi
+namespace UserManagement.Api
 {
     public class Program
     {
@@ -20,9 +20,7 @@ namespace TestIdentityServerApi
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder
-                        .UseStartup<Startup>()
-                        .UseUrls("http://localhost:5050");
+                    webBuilder.UseStartup<Startup>().UseUrls("http://localhost:5050"); 
                 });
     }
 }

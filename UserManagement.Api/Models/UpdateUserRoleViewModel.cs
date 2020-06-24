@@ -1,4 +1,4 @@
-﻿namespace IdentityServerPOC.Dtos
+﻿namespace UserManagement.Api.Models
 {
     public class UpdateUserRoleViewModel
     {

@@ -1,7 +1,7 @@
 ﻿using IdentityServerPOC.Infrastructure;
 using System.Linq;
 
-namespace IdentityServerPOC.Dtos
+namespace UserManagement.Api.Models
 {
     public class UserViewModel
     {

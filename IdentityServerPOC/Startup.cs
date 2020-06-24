@@ -3,7 +3,6 @@ using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Services;
 using IdentityServerPOC.Infrastructure;
 using IdentityServerPOC.Infrastructure.Middleware;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -28,19 +27,6 @@ namespace IdentityServerPOC
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //IdentityModelEventSource.ShowPII = true;
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.RequireAuthenticatedSignIn = false;
-            }).AddJwtBearer(o =>
-            {
-                o.Authority = "http://localhost:500";
-                o.Audience = "digitalrecipiepoc";
-                o.RequireHttpsMetadata = false;
-
-            });
 
             services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
 
@@ -50,7 +36,7 @@ namespace IdentityServerPOC
                 options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(3);
                 options.Lockout.AllowedForNewUsers = true;
 
-             })
+            })
               .AddEntityFrameworkStores<AppIdentityDbContext>()
               .AddDefaultTokenProviders();
 
@@ -74,20 +60,12 @@ namespace IdentityServerPOC
 
             services.AddControllersWithViews();
 
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ApiReader", policy => policy.RequireClaim("scope", "api.read"));
-                //options.AddPolicy("SuperAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "superadmin"));
-            });
-
-
-           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-           // InitializeDatabase(app);
+            InitializeDatabase(app);
 
 
             if (env.IsDevelopment())
@@ -102,9 +80,6 @@ namespace IdentityServerPOC
 
             app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
             app.UseIdentityServer();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

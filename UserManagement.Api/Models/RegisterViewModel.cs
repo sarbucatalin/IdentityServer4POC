@@ -1,7 +1,7 @@
 ﻿using IdentityServerPOC.Infrastructure;
 using System.ComponentModel.DataAnnotations;
 
-namespace IdentityServerPOC.Models
+namespace UserManagement.Api.Models
 {
     public class RegisterRequestViewModel
     {
