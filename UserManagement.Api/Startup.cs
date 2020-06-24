@@ -1,12 +1,14 @@
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using IdentityServerPOC.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
-namespace TestIdentityServerApi
+namespace UserManagement.Api
 {
     public class Startup
     {
@@ -20,6 +22,11 @@ namespace TestIdentityServerApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("Default")));
+           
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+            .AddEntityFrameworkStores<AppIdentityDbContext>()
+            .AddDefaultTokenProviders();
 
             services.AddAuthentication(options =>
             {
@@ -40,7 +47,6 @@ namespace TestIdentityServerApi
                 //options.AddPolicy("SuperAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "superadmin"));
             });
 
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,15 +56,18 @@ namespace TestIdentityServerApi
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            //app.UseHttpsRedirection();
+
             app.UseRouting();
 
             app.UseCors(options => options.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 
-
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => {
+            app.UseEndpoints(endpoints =>
+            {
                 endpoints.MapControllers();
             });
         }
