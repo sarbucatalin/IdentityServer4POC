@@ -7,12 +7,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityModel;
 using UserManagement.Api.Models;
 
 namespace UserManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Policy = "SuperAdmin")]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -50,7 +52,6 @@ namespace UserManagement.Api.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequestViewModel model)
         {
 
@@ -74,7 +75,7 @@ namespace UserManagement.Api.Controllers
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("userName", user.UserName));
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("name", user.Name));
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("email", user.Email));
-            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", role.Name));
+            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim(JwtClaimTypes.Role, role.Name));
             await _userManager.AddToRoleAsync(user, role.Name);
 
             return Ok(new RegisterResponseViewModel(user));
