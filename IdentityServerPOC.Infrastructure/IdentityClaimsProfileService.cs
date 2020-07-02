@@ -1,5 +1,4 @@
 ﻿using IdentityModel;
-using IdentityServer4;
 using IdentityServer4.Extensions;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
@@ -33,7 +32,7 @@ namespace IdentityServerPOC.Infrastructure
 
             claims = claims.Where(claim => context.RequestedClaimTypes.Contains(claim.Type)).ToList();
             claims.Add(new Claim(JwtClaimTypes.GivenName, user.Name));
-            claims.Add(new Claim(IdentityServerConstants.StandardScopes.Email, user.Email));
+            claims.Add(new Claim(JwtClaimTypes.Email, user.Email));
             claims.Add(new Claim(JwtClaimTypes.Role, role));
 
             context.IssuedClaims = claims;

@@ -52,6 +52,7 @@ namespace UserManagement.Api.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequestViewModel model)
         {
 
@@ -73,8 +74,8 @@ namespace UserManagement.Api.Controllers
 
 
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("userName", user.UserName));
-            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("name", user.Name));
-            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("email", user.Email));
+            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim(JwtClaimTypes.Name, user.Name));
+            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim(JwtClaimTypes.Email, user.Email));
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim(JwtClaimTypes.Role, role.Name));
             await _userManager.AddToRoleAsync(user, role.Name);
 
@@ -124,7 +125,7 @@ namespace UserManagement.Api.Controllers
         }
 
         [HttpPut]
-        [Route("{userId}/Unlock")]
+        [Route("{userId}/unlock")]
         public async Task<IActionResult> Unlock(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);

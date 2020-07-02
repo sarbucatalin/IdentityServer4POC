@@ -41,7 +41,7 @@ namespace UserManagement.Api
                 .AddIdentityServerAuthentication(options =>
                 {
                     options.Authority = "http://localhost:5000";
-                    options.ApiName = "digitalrecipiepoc";
+                    options.ApiName = "userManagement";
                     options.RequireHttpsMetadata = false;
                 });
 
@@ -56,6 +56,7 @@ namespace UserManagement.Api
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("SuperAdmin", policy => policy.RequireClaim(JwtClaimTypes.Role, "superadmin"));
+                options.AddPolicy("Admin", policy => policy.RequireClaim(JwtClaimTypes.Role, "admin"));
             });
         }
 

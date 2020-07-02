@@ -30,6 +30,7 @@ namespace UserManagement.Api.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetRoles()
         {
             return Ok(await _roleManager.Roles.ToListAsync());
