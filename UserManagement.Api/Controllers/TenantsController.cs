@@ -57,7 +57,7 @@ namespace UserManagement.Api.Controllers
             }
         }
 
-        [HttpPut()]
+        [HttpPut]
         public async Task<IActionResult> Edit(TenantDto tenantDto)
         {
             try
@@ -79,6 +79,7 @@ namespace UserManagement.Api.Controllers
         {
             try
             {
+                tenantDto.Id = Guid.NewGuid().ToString();
                 await _tenantService.Create(tenantDto);
 
                 return Ok(tenantDto);

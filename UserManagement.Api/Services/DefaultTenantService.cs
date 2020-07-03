@@ -10,7 +10,7 @@ namespace UserManagement.Api.Services
     public class DefaultTenantService : ITenantService
     {
         private readonly HttpClient _httpClient;
-        private const string BaseAddress = "http://localhost:5020/api/Tenant";
+        private const string BaseAddress = "http://localhost:32770/api/Tenant";
 
         public DefaultTenantService()
         {
