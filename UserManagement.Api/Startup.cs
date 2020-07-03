@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using IdentityModel;
 using IdentityServer4.AccessTokenValidation;
 using UserManagement.Api.Infrastructure.Middleware;
+using UserManagement.Api.Services;
 
 namespace UserManagement.Api
 {
@@ -56,8 +57,14 @@ namespace UserManagement.Api
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("SuperAdmin", policy => policy.RequireClaim(JwtClaimTypes.Role, "superadmin"));
-                options.AddPolicy("Admin", policy => policy.RequireClaim(JwtClaimTypes.Role, "admin"));
+
+                options.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireClaim(JwtClaimTypes.Role, "superadmin", "admin");
+                });
             });
+
+            services.AddTransient<ITenantService, DefaultTenantService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
