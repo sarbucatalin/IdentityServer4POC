@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityModel;
 using UserManagement.Api.Models;
 
 namespace UserManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = "ApiReader")]
+    [Authorize(Policy = "Admin")]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -35,8 +35,9 @@ namespace UserManagement.Api.Controllers
             {
                 var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
                 var roleId = _roleManager.Roles.FirstOrDefault(ir => ir.Name == role)?.Id;
-                returnUsers.Add(new UserViewModel(user));
+                returnUsers.Add(new UserViewModel(user, roleId));
             }
+
             return returnUsers;
         }
 
@@ -47,7 +48,7 @@ namespace UserManagement.Api.Controllers
             var role = (await _userManager.GetRolesAsync(user)).FirstOrDefault();
             var roleId = _roleManager.Roles.FirstOrDefault(ir => ir.Name == role)?.Id;
 
-            return new UserViewModel(user);
+            return new UserViewModel(user, roleId);
         }
 
         [HttpPost]
@@ -60,23 +61,23 @@ namespace UserManagement.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            //if (!string.IsNullOrEmpty(model.Role) && !await _roleManager.RoleExistsAsync(model.Role))
-            //{
-            //    return BadRequest();
-            //}
+            var role = await _roleManager.FindByIdAsync(model.RoleId);
+            if (role == null)
+            {
+                return BadRequest();
+            }
 
             var user = new ApplicationUser { UserName = model.Email, Name = model.Name, Email = model.Email };
-
             var result = await _userManager.CreateAsync(user, model.Password);
-
 
             if (!result.Succeeded) return BadRequest(result.Errors);
 
+
             await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("userName", user.UserName));
-            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("name", user.Name));
-            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("email", user.Email));
-            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim("role", Roles.SuperAdmin));
-            await _userManager.AddToRoleAsync(user, Roles.SuperAdmin);
+            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim(JwtClaimTypes.Name, user.Name));
+            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim(JwtClaimTypes.Email, user.Email));
+            await _userManager.AddClaimAsync(user, new System.Security.Claims.Claim(JwtClaimTypes.Role, role.Name));
+            await _userManager.AddToRoleAsync(user, role.Name);
 
             return Ok(new RegisterResponseViewModel(user));
         }
@@ -84,18 +85,23 @@ namespace UserManagement.Api.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateRole(UpdateUserRoleViewModel updateUserRole)
         {
-            if (updateUserRole.Role.ToLower() == Roles.SuperAdmin)
-                return Forbid();
 
             var user = await _userManager.FindByIdAsync(updateUserRole.UserId);
-            if (user == null && !await _roleManager.RoleExistsAsync(updateUserRole.Role))
+            if (user == null)
                 return BadRequest();
+
+            var role = await _roleManager.FindByIdAsync(updateUserRole.RoleId);
+            if (role == null)
+                return BadRequest();
+
+            if (role.Name.ToLower() == Roles.SuperAdmin)
+                return Forbid();
 
             var existingRoles = await _userManager.GetRolesAsync(user);
             if (existingRoles.Any())
                 await _userManager.RemoveFromRolesAsync(user, existingRoles);
 
-            var result = await _userManager.AddToRoleAsync(user, updateUserRole.Role);
+            var result = await _userManager.AddToRoleAsync(user, role.Name);
             if (result.Succeeded) return Ok();
             return BadRequest(result.Errors);
         }
@@ -117,9 +123,9 @@ namespace UserManagement.Api.Controllers
             }
             return BadRequest(result.Errors);
         }
-      
+
         [HttpPut]
-        [Route("{userId}/Unlock")]
+        [Route("{userId}/unlock")]
         public async Task<IActionResult> Unlock(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);

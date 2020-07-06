@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using System.Collections.Generic;
 
-namespace IdentityServerPOC.Infrastructure.Middleware
+namespace UserManagement.Api.Infrastructure.Middleware
 {
     public static class SwaggerServiceMiddleware
     {

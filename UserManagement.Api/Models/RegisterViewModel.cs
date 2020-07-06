@@ -21,7 +21,8 @@ namespace UserManagement.Api.Models
         [Display(Name = "Password")]
         public string Password { get; set; }
 
-        //public string Role { get; set; }
+        [Required]
+        public string RoleId { get; set; }
     }
 
     public class RegisterResponseViewModel

@@ -1,0 +1,28 @@
+{
+  "Clients": [
+    {
+      "ClientId": "angular-user-management",
+      "ClientName": "Angular User Management",
+      "RequireConsent": false,
+      "AllowedGrantTypes": [ "implicit" ],
+      "AllowAccessTokensViaBrowser": true,
+      "RedirectUris": [ "http://localhost:4200/signin-callback" ],
+      "PostLogoutRedirectUris": [ "http://localhost:4200/signout-callback" ],
+      "AllowedScopes": [ "openid", "profile", "email", "userManagement.read" ],
+      "AccessTokenLifetime": 3600,
+      "AllowedCorsOrigins": [ "http://localhost:4200" ]
+    },
+    {
+      "ClientId": "angular-digital-recipe",
+      "ClientName": "Angular Digital Recipe",
+      "RequireConsent": false,
+      "AllowedGrantTypes": [ "implicit" ],
+      "AllowAccessTokensViaBrowser": true,
+      "RedirectUris": [ "http://localhost:4201/signin-callback" ],
+      "PostLogoutRedirectUris": [ "http://localhost:4201/signout-callback" ],
+      "AllowedScopes": [ "openid", "profile", "email", "digitalRecipePoc.read", "digitalRecipePoc.write" ],
+      "AccessTokenLifetime": 3600,
+      "AllowedCorsOrigins": [ "http://localhost:4201" ]
+    }
+  ]
+}

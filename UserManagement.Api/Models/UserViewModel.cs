@@ -1,5 +1,5 @@
 ﻿using IdentityServerPOC.Infrastructure;
-using System.Linq;
+using System;
 
 namespace UserManagement.Api.Models
 {
@@ -10,7 +10,7 @@ namespace UserManagement.Api.Models
         public string Email { get; set; }
         public string Name { get; set; }
         public bool IsLocked { get; set; }
-        public string Role { get; set; }
+        public string RoleId { get; set; }
 
         public UserViewModel(ApplicationUser user)
         {
@@ -18,8 +18,14 @@ namespace UserManagement.Api.Models
             UserName = user.UserName;
             Email = user.Email;
             Name = user.Name;
-            IsLocked = user.LockoutEnabled;
+            IsLocked = user.LockoutEnd > DateTimeOffset.Now;
+
             //Role = user.Roles.Any() ? user.Roles.FirstOrDefault().ToString() : string.Empty;
+        }
+
+        public UserViewModel(ApplicationUser user, string roleId) : this(user)
+        {
+            RoleId = roleId;
         }
     }
 }

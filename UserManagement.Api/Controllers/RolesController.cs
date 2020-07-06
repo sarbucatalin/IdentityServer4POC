@@ -8,7 +8,7 @@ namespace UserManagement.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Policy = "ApiReader")]
+    [Authorize(Policy = "Admin")]
     public class RolesController : ControllerBase
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -21,7 +21,7 @@ namespace UserManagement.Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateRoleRequest request)
         {
-            if (string.IsNullOrEmpty(request.Name) 
+            if (string.IsNullOrEmpty(request.Name)
                 && await _roleManager.RoleExistsAsync(request.Name))
             {
                 return BadRequest();
@@ -30,6 +30,7 @@ namespace UserManagement.Api.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetRoles()
         {
             return Ok(await _roleManager.Roles.ToListAsync());

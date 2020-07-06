@@ -2,7 +2,6 @@ using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
 using IdentityServer4.Services;
 using IdentityServerPOC.Infrastructure;
-using IdentityServerPOC.Infrastructure.Middleware;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -56,8 +55,6 @@ namespace IdentityServerPOC
 
             services.AddTransient<IProfileService, IdentityClaimsProfileService>();
 
-            services.AddSwaggerDocumentation();
-
             services.AddControllersWithViews();
 
         }
@@ -71,7 +68,6 @@ namespace IdentityServerPOC
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwaggerDocumentation();
             }
 
             app.UseRouting();
